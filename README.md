@@ -60,7 +60,9 @@ Modeling and analysis of fixed-length text window sequences by manually designin
 
 In order to solve the above problem, Markov's hypothesis is introduced: the probability of an occurrence of an arbitrary word is related to only a finite number of words or words that occur before it.
  - If the occurrence of a word is independent of the words around it, then we call it a unigram, or a unitary language model.
- $$ P(S) = P(W_1) * P(W_2) * ... * P(W_n)$$
+ 
+![4](/4.png)
+
  - If the occurrence of a word depends only on the occurrence of a word before it, then we call it bigram.
  $$ P(S) = P(W_1) * P(W_2|W_1) * P(W_3|W_2)*... * P(W_n|W_{n-1})$$
  - If the occurrence of a word depends only on the two words appearing before it, then we call it trigram.
