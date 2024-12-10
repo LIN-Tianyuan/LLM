@@ -7,7 +7,7 @@
 The Large Language Model (LLM) is an artificial intelligence model designed to understand and generate human language. Large Language Model
 LLMs can handle a wide range of natural language tasks, such as text categorization, question and answer, translation, conversation, etc.
 
-![Elovutionary Tree](/1.png)
+![Elovutionary Tree](/img/1.png)
 
 In general, a large language model (LLM) is a language model that contains hundreds of billions (or more) of parameters (currently, models with more than 10B parameters are defined as large language models), which are trained on large amounts of textual data, such as the models GPT-3, ChatGPT, PaLM, BLOOM, and LLaMA.
 These parameters are trained on large amounts of textual data, such as models GPT-3, ChatGPT, PaLM, BLOOM, and LLaMA.
@@ -61,29 +61,31 @@ Modeling and analysis of fixed-length text window sequences by manually designin
 In order to solve the above problem, Markov's hypothesis is introduced: the probability of an occurrence of an arbitrary word is related to only a finite number of words or words that occur before it.
  - If the occurrence of a word is independent of the words around it, then we call it a unigram, or a unitary language model.
  
- ![4](/4.png)
+ ![4](img/4.png)
 
  - If the occurrence of a word depends only on the occurrence of a word before it, then we call it bigram.
 
- ![5](/5.png)
+ ![5](img/5.png)
  - If the occurrence of a word depends only on the two words appearing before it, then we call it trigram.
- $$ P(S) = P(W_1) * P(W_2|W_1) * P(W_3|W_2, W_1)*... * P(W_n|W_{n-1}, W_{n-2})$$
+ 
+![6](img/8.png)
  - In general, the N-tuple model is the assumption that the probability of occurrence of the current word is only related to the N-1 words preceding it, and these probability parameters are all computable from large-scale corpora, such as the ternary probability:
- $$ P(W_i|W_{i-1}, W_{i-2}) = Count(W_{i-2}W_{i-1}W_i) / Count(W_{i-2}W_{i-1})$$
+
+  ![5](img/10.png)
 The most used in practice are bigram and trigram, and the next example is the bigram language model to understand how it works:
  - First we prepare a corpus (simply understood as a dataset that allows the model to learn), in order to calculate the parameters of the corresponding binary model, i.e. $P(W_i|W_{i-1})$, we have to count, i.e. $C(W_{i-1},W_i)$, then count $C(W_{i-1})$, and then divide can be used to get the probability.
  - $C(W_{i-1},W_i)$ The counting results are as follows：
- ![count1](/2.png)
+ ![count1](/img/2.png)
  - $C(W_{i-1})$ The counting results are as follows：
- ![count2](/3.png)
+ ![count2](/img/3.png)
  - So how does the bigram language model realize the results of parameter calculation for the above corpus? Suppose, I want to calculate think $P(_想|_我)≈ 0.38$ , the calculation process is shown as follows: (other parameters calculation process is similar)
  $$P(_想|_我)≈ {\frac{C(_我,_想)}{C(_我)}} = {\frac{800}{2100}} ≈0.38 $$
  - If the binary model (bigram) for this corpus is built, our target computation can be realized.
  - Calculate the probability of a sentence, as an example:
-  ![count3](/6.png)
+  ![count3](img/6.png)
  - Predict the most likely next word in a sentence, e.g., 我想去打 [mask]? Think: mask = 篮球 or mask = 晚饭.
- ![count4](/7.png)
- - It can be seen that $P(_{我想去打篮球}) > P(_{我想去打晚饭})$, so mask = 篮球, contrasting with the real context and also with human habits. 
+ ![count4](img/7.png)
+ - It can be seen that P(我想去打篮球) > P(我想去打晚饭), so mask = 篮球, contrasting with the real context and also with human habits. 
 
 Characteristics of the N-gram language model:
  - Advantages: using great likelihood estimation, parameters are easy to train; completely contains all the information of the first n-1 words; highly interpretable, intuitive and easy to understand.
