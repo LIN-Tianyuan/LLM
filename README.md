@@ -72,6 +72,7 @@ In order to solve the above problem, Markov's hypothesis is introduced: the prob
  - In general, the N-tuple model is the assumption that the probability of occurrence of the current word is only related to the N-1 words preceding it, and these probability parameters are all computable from large-scale corpora, such as the ternary probability:
 
   ![5](img/10.png)
+
 The most used in practice are bigram and trigram, and the next example is the bigram language model to understand how it works:
  - First we prepare a corpus (simply understood as a dataset that allows the model to learn), in order to calculate the parameters of the corresponding binary model, i.e. $P(W_i|W_{i-1})$, we have to count, i.e. $C(W_{i-1},W_i)$, then count $C(W_{i-1})$, and then divide can be used to get the probability.
  - $C(W_{i-1},W_i)$ The counting results are as follows：
