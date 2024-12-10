@@ -61,10 +61,11 @@ Modeling and analysis of fixed-length text window sequences by manually designin
 In order to solve the above problem, Markov's hypothesis is introduced: the probability of an occurrence of an arbitrary word is related to only a finite number of words or words that occur before it.
  - If the occurrence of a word is independent of the words around it, then we call it a unigram, or a unitary language model.
  
-![4](/4.png)
+ ![4](/4.png)
 
  - If the occurrence of a word depends only on the occurrence of a word before it, then we call it bigram.
- $$ P(S) = P(W_1) * P(W_2|W_1) * P(W_3|W_2)*... * P(W_n|W_{n-1})$$
+
+ ![5](/5.png)
  - If the occurrence of a word depends only on the two words appearing before it, then we call it trigram.
  $$ P(S) = P(W_1) * P(W_2|W_1) * P(W_3|W_2, W_1)*... * P(W_n|W_{n-1}, W_{n-2})$$
  - In general, the N-tuple model is the assumption that the probability of occurrence of the current word is only related to the N-1 words preceding it, and these probability parameters are all computable from large-scale corpora, such as the ternary probability:
@@ -79,10 +80,9 @@ The most used in practice are bigram and trigram, and the next example is the bi
  $$P(_想|_我)≈ {\frac{C(_我,_想)}{C(_我)}} = {\frac{800}{2100}} ≈0.38 $$
  - If the binary model (bigram) for this corpus is built, our target computation can be realized.
  - Calculate the probability of a sentence, as an example:
- $$P(_{我想去打篮球})=P(_想|_我) * P(_去|_想) * P(_打|_去) * P(_{篮球}|_打)= {\frac{800}{2100} * \frac{600}{900} * \frac{690}{2000} * \frac{20}{800}} ≈ 0.0022 $$ 
+  ![count3](/6.png)
  - Predict the most likely next word in a sentence, e.g., 我想去打 [mask]? Think: mask = 篮球 or mask = 晚饭.
-$$P(_{我想去打篮球}) =≈ 0.0022 $$
-$$P(_{我想去打晚饭}) =≈ 0.00022 $$
+ ![count4](/7.png)
  - It can be seen that $P(_{我想去打篮球}) > P(_{我想去打晚饭})$, so mask = 篮球, contrasting with the real context and also with human habits. 
 
 Characteristics of the N-gram language model:
