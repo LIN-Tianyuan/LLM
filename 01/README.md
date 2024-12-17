@@ -113,6 +113,7 @@ Neural network characteristics:
 
 ### 2.3 Pre-trained language modeling based on Transformer
 ![transformer](/img/12.png)
+
 The Transformer model consists of a number of encoder and decoder layers with strong ability to learn complex semantic information, and many mainstream pre-training models choose the Transformer structure when extracting features, and a series of Transformer-based pre-training models have been produced, including GPT, BERT, T5, etc. These models are able to learn a large number of linguistic representations from a large amount of generalized textual data and apply this knowledge to downstream tasks, obtaining better results.
 
 Pre-training language models are used in a variety of ways:
