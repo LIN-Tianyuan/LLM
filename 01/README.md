@@ -49,7 +49,7 @@ Based on the development of language modeling techniques, language models can be
  - Pre-trained language models
  - Large Language Models
 
-#### 2.1 Rule-based and statistical language modeling (N-gram)
+### 2.1 Rule-based and statistical language modeling (N-gram)
 Modeling and analysis of fixed-length text window sequences by manually designing features and using statistical methods is also known as N-gram language modeling. In the example above, the probability of a sentence sequence is calculated using the chain rule, which has two drawbacks:
 
  - The parameter space is too large: there are too many possibilities $P(W_n|W_1,W_2,...,W_n)$ for conditional probabilities to be estimated, and they are not always useful.
@@ -91,3 +91,44 @@ Characteristics of the N-gram language model:
  - Disadvantages: lack of long-term, can only model the first n-1 words; as n increases, the parameter space grows exponentially; sparse data, inevitably OOV
 problems; based solely on statistical frequency, poor generalization ability.
 
+### 2.2 Neural network language model
+Along with the development of neural network technology, people began to try to use neural networks to build language models and then solve the problems of N-gram language models.
+
+![img11](/img/11.png)
+
+The above figure belongs to one of the most basic neural network architectures:
+
+ - The input to the model: $w_{t-n+1}, ... , w_{t-2}, w_{t-1}$ is the first n-1 words. Now we need to predict the next word $w_t$ based on these known n-1 words.
+$C(w)$ denotes the corresponding word vector $w$ .
+
+ - The first layer of the network (the input layer) is to splice the first and last of $C(w_{t-n+1}), ... , C(w_{t-2}), C(w_{t-1})$ these n-1 vectors to form a vector of size $(n-1) * m $, denoted as $x$.
+
+ - The second layer of the network (the hidden layer) is just like a normal neural network, which uses a fully connected layer, and then passes through the fully connected layer and is processed by the $tanh$ activation function.
+ - The third layer of the network (the output layer) has a total of $V$ nodes ( $V$ stands for the vocabulary of the corpus), and essentially this output layer is also a fully connected layer. Each output node $y_i$ represents the un-normalized log probability of the next word $i$. The output value $y$ is finally normalized using a softmax activation function. The maximum probability value is obtained, which is the result we need to predict.
+
+Neural network characteristics:
+ - Advantages: Using neural networks to model the constraints between the probability of the current word occurrence and its previous n-1 words, it is clear that this approach has better generalization ability compared to n-gram, as long as the word representation is good enough. This reduces the problem of data sparsity to a large extent.
+
+ - Disadvantages: the modeling ability for long sequences is limited, there may be problems such as long-distance forgetting and gradient disappearance during training, and it is difficult to construct a model with stable long text output.
+
+### 2.3 Pre-trained language modeling based on Transformer
+![transformer](/img/12.png)
+The Transformer model consists of a number of encoder and decoder layers with strong ability to learn complex semantic information, and many mainstream pre-training models choose the Transformer structure when extracting features, and a series of Transformer-based pre-training models have been produced, including GPT, BERT, T5, etc. These models are able to learn a large number of linguistic representations from a large amount of generalized textual data and apply this knowledge to downstream tasks, obtaining better results.
+
+Pre-training language models are used in a variety of ways:
+ - Pre-training: pre-training refers to building a basic model and training it on some more basic datasets and corpora first, and then training it according to specific tasks to learn the general features of the data.
+- Fine-tuning: Fine-tuning refers to using the pre-trained model for transfer learning in specific downstream tasks to obtain better generalization effects.
+
+Characteristics of pre-trained language models:
+- Advantages: more powerful generalization ability, rich semantic representation, can effectively prevent overfitting.
+
+- Disadvantages: high computational resource requirements, poor interpretability, etc.
+
+### 2.4 Large language model
+With the research on pre-trained language models, it has gradually been discovered that there may be a Scaling Law, i.e., as the parameters of a pre-trained model increase exponentially, the performance of its language model also rises linearly. In 2020, OpenAI released GPT-3, which has a reference count of up to 175 billion, and demonstrated for the first time the performance of a large language model.
+
+Compared to previous pre-trained language models with smaller parameter counts, e.g., Bert-large with 330 million parameters and GPT-2 with 1.7 billion parameters, GPT-3 demonstrates a leap in Few-shot language task capability and possesses some capabilities that pre-trained language models do not have. This phenomenon is subsequently referred to as capability emergence. For example, GPT-3 is able to perform contextual learning, completing subsequent tasks based solely on user-given task examples without adjusting the weights. This leap in capability triggered a boom in research on large language models, with major tech giants launching language models with huge number of parameters, such as Meta's LLaMA model with 130 billion parameters and Google's PaLM with 540 billion parameters.
+
+Characteristics of a large language model:
+ - Advantages: Intelligent as “human”, with the ability to communicate and chat with humans, and even with the ability to use plug-ins for automated information retrieval.
+- Disadvantages: large number of parameters, high arithmetic requirements, generation of partially harmful, biased content, etc.
