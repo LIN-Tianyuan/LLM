@@ -285,6 +285,7 @@ PPL is used to measure how well a probability distribution or probability model 
 Basic Idea of PPL:
  - The language model that assigns higher probability values to the sentences in the test set is better, when the language model is trained and the sentences in the test set are normal sentences, then the trained model is the one that has the higher probability on the test set.
 - Basic formula (both ways):
+
   ![5](/img/13.png)
   ![5](/img/14.png)
 
