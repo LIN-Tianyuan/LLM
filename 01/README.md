@@ -133,3 +133,100 @@ Compared to previous pre-trained language models with smaller parameter counts, 
 Characteristics of a large language model:
  - Advantages: Intelligent as “human”, with the ability to communicate and chat with humans, and even with the ability to use plug-ins for automated information retrieval.
 - Disadvantages: large number of parameters, high arithmetic requirements, generation of partially harmful, biased content, etc.
+
+## 3. Indicators for the evaluation of language models
+
+### 3.1 BLEU
+The BLEU (Bilingual Evaluation of Understudies) score is an indicator that assesses the quality of a text translated from one language into another. It defines “quality” as the degree of consistency with the results of human translations.
+
+The BLEU algorithm actually determines the degree of similarity between two sentences. The BLEU score ranges from 0 to 1. The closer the score is to 1, the higher the quality of the translation.
+
+There are many variants of BLEU, which can be divided into multiple evaluation metrics based on `n-gram`, and four common evaluation metrics are BLEU-1, BLEU-2, BLEU-3, and BLEU-4, where `n-gram` refers to the number of consecutive words as n. BLEU-1 measures word-level accuracy, and higher-order BLEU can measure sentence fluency. In practice, we usually take N=1~4, and then perform a weighted average.
+
+Basic step:
+ - Compute the N-grams model for the candidate and reference sentences separately, then count the number of their matches and compute the match.
+
+ - Formula: number of matching n-grams in candidate and reference (correct prediction) / number of n-grams in candidate
+
+Suppose the machine-translated translation (candidate) and a reference translation (reference) are as follows:
+ ```text
+ candidate: It is a nice day today
+reference: today is a nice day
+ ```
+
+Matching using 1-gram
+ ```text
+candidate: {it, is, a, nice, day, today}
+reference: {today, is, a, nice, day}
+
+Result:
+Where {today, is, a, nice, day} matches, so the match is 5/6
+ ```
+
+Matching using 2-gram
+ ```text
+candidate: {it is, is a, a nice, nice day, day today}
+reference: {today is, is a, a nice, nice day}
+
+Result:
+Where {is a, a nice, nice day} matches, so the match is 3/5
+ ```
+
+Matching using 3-gram
+ ```text
+candidate: {it is a, is a nice, a nice day, nice day today}
+reference: {today is a, is a nice, a nice day}
+
+Result:
+Where {is a nice, a nice day} matches, so the match is 2/4
+ ```
+
+Matching using 4-gram
+ ```text
+candidate: {it is a nice, is a nice day, a nice day today}
+reference: {today is a nice, is a nice day}
+
+Result:
+Where {is a nice day} matches, so the match is 1/3
+ ```
+
+The count of matched `N-grams` is modified to ensure that it takes into account occurrences of words in the `reference` text, rather than rewarding candidates that generate a large number of reasonably translated words.
+
+ - Examples:
+ ```text
+ candidate: the the the the
+reference: The cat is standing on the ground
+If the matching is done according to the 1-gram method, the match is 1, which is obviously unreasonable, so the number of occurrences of a word is calculated for improvement.
+ ```
+
+ - The method of calculating the number of occurrences of a word is replaced by the calculation of the minimum number of occurrences of a word in the translated text, as shown in the formula below:
+ $count_k = min(c_k, s_k)$
+
+ where $k$ denotes the kth occurrence of the term in the machine translation (candidate), $c_k$ represents the number of occurrences of the term in the machine translation, and $s_k$ represents the number of occurrences of the term in the human translation (reference).
+
+ python code implementation:
+ ```python
+ # The first step is to install the nltk package --> pip install nltk
+from nltk.translate.bleu_score import sentence_bleu
+def cumulative_bleu(reference, candidate):
+    bleu_1_gram = sentence_bleu(reference, candidate, weights=(1, 0, 0, 0))
+    bleu_2_gram = sentence_bleu(reference, candidate, weights=(0.5, 0.5, 0, 0))
+    bleu_3_gram = sentence_bleu(reference, candidate, weights=(0.33, 0.33, 0.33, 0))
+    bleu_4_gram = sentence_bleu(reference, candidate, weights=(0.25, 0.25, 0.25,
+0.25))
+    # print('bleu 1-gram: %f' % bleu_1_gram)
+    # print('bleu 2-gram: %f' % bleu_2_gram)
+    # print('bleu 3-gram: %f' % bleu_3_gram)
+    # print('bleu 4-gram: %f' % bleu_4_gram)
+    return bleu_1_gram, bleu_2_gram, bleu_3_gram, bleu_4_gram
+# Generate Text
+candidate_text = ["This", "is", "some", "generated", "text"]
+# List of reference texts
+reference_texts = [["This", "is", "a", "reference", "text"],
+["This", "is", "another", "reference", "text"]]
+# Calculation of the Bleu indicator
+c_bleu = cumulative_bleu(reference_texts, candidate_text)
+# Print results
+print("The Bleu score is:", c_bleu)
+# The Bleu score is: (0.6, 0.387, 1.5949011744633917e-102, 9.283142785759642e-155)
+ ```
