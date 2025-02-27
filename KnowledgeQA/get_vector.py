@@ -1,0 +1,36 @@
+# pip install faiss-cpu
+import os
+from langchain_openai import OpenAIEmbeddings
+from langchain_unstructured import UnstructuredLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
+
+
+def main():
+    # 第一步：加载文档
+    loader = UnstructuredLoader("物流信息.txt")
+    data = loader.load()
+
+    # 第二步：切分文档
+    # chunk_size: 每个切分的文本块的最大字符数
+    # chunk_overlap: 两个相邻文本块共享的字符数（重叠区域）
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=128, chunk_overlap=4)
+    split_data = text_splitter.split_documents(data)
+
+    # 第三步：使用 OpenAI 的 Embeddings
+    embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")  # OpenAI 向量模型
+
+    # 第四步：存入 FAISS 向量数据库
+    vector_store = FAISS.from_documents(split_data, embeddings)
+    # 保存 FAISS 数据库
+    vector_store.save_local("./faiss/camp")
+
+    return split_data
+
+if __name__ == '__main__':
+    split_data = main()
+    print(f"split_data: {split_data}")
+
+"""
+split_data: [Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': '1a427964eea4dc42fc4be51aef05043f'}, page_content='物流公司：速达物流'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': 'c2720e17d38adaf6ef94710990409900'}, page_content='公司总部：北京市'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': '13e515a7bce6258f5899fb1ea772513a'}, page_content='业务范围：国际快递、仓储管理'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': '55ec478e55b9873c54357c1707a1f804'}, page_content='货物追踪：'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': '91efa4bcc08a345e45aa3f243ca883ff'}, page_content='货物编号：ABC123456'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'parent_id': '91efa4bcc08a345e45aa3f243ca883ff', 'category': 'UncategorizedText', 'element_id': 'af2c796c8a4eac44cb6ceab49f612ef1'}, page_content='发货日期：2023'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'parent_id': '91efa4bcc08a345e45aa3f243ca883ff', 'category': 'UncategorizedText', 'element_id': '5e8d74361bdd3ca92ee48b0690ab9a8b'}, page_content='01'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'parent_id': '91efa4bcc08a345e45aa3f243ca883ff', 'category': 'UncategorizedText', 'element_id': 'ffbb2c23ebdefc08e74cd6aace2b5e2f'}, page_content='15'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': '65de60ed5e9652dcefd6187ea98a06f8'}, page_content='当前位置：上海分拨中心'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': 'ea634e0609d18d331f63ce77befea786'}, page_content='预计到达日期：2023'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'parent_id': 'ea634e0609d18d331f63ce77befea786', 'category': 'UncategorizedText', 'element_id': 'b6468a7460a8298f06e28090cfc123f3'}, page_content='01'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'parent_id': 'ea634e0609d18d331f63ce77befea786', 'category': 'UncategorizedText', 'element_id': '1eecbc025fd03931968b80fb4fcee0ba'}, page_content='20'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': '8ba593aedb3602e17ad9dc6c62fbb32b'}, page_content='运输方式：'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': '148b23e1c1fb144d2f145dffb260a6c4'}, page_content='运输公司：快运通'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': '083a347ea1ff14f06e424da9bc9e1700'}, page_content='运输方式：陆运'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': 'cee98bdee6a1586bdd42cc5c1fd1c19a'}, page_content='出发地：广州'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': '890c9cf39c64b806d9a1c67d7e416857'}, page_content='目的地：重庆'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': '8c5669762d7e1825433097dedef07207'}, page_content='预计运输时间：3天'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': 'ec32ca9401217e3c0a302357db5de8c3'}, page_content='仓储信息：'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': '9b268dd62ee3af44f7682e6e3e2d9a5d'}, page_content='仓库名称：东方仓储中心'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': '7165b6fd3d7dc8e51ff6aa4bf2e37b25'}, page_content='仓库位置：深圳市'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': 'a1648d42e9b421c3737d837243f6c1fd'}, page_content='存储货物类型：电子产品'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': '692ab3bbf69b5c732c5bc074f7d2da16'}, page_content='存储条件：常温仓储'), Document(metadata={'source': '物流信息.txt', 'last_modified': '2025-01-30T16:26:06', 'languages': ['zho'], 'filename': '物流信息.txt', 'filetype': 'text/plain', 'category': 'Title', 'element_id': '92da57d13e4284439844c91b24e00260'}, page_content='当前库存量：1000件')]
+"""
