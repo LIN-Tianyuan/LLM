@@ -11,4 +11,8 @@ transformers >= 4.2.0
 pytorch >= 1.7.0
 ```
 ## 3. Code
- - Text processing: data_preprocess/preprocess.py
+ - Text processing: data_preprocess/...
+ - Model building(GPT2LMHeadModel(config=model_config))
+ - Model train: train.py
+ - Helper class function: functions_tools.py
+ - Model validation: 

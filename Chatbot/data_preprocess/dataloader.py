@@ -3,7 +3,12 @@ import torch.nn.utils.rnn as rnn_utils  # 导入rnn_utils模块，用于处理�
 from torch.utils.data import Dataset, DataLoader  # 导入Dataset和DataLoader模块，用于加载和处理数据集
 import torch  # 导入torch模块，用于处理张量和构建神经网络
 import pickle  # 导入pickle模块，用于序列化和反序列化Python对象
-from dataset import *  # 导入自定义的数据集类
+import sys
+import os
+# 让Python识别Chatbot/
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from data_preprocess.dataset import *  # 导入自定义的数据集类
+
 
 def load_dataset(train_path, valid_path):
     # print('进入函数')
@@ -86,7 +91,7 @@ def collate_fn(batch):
          4567,  8024,  3418,  2945,   798,  5301,  3466,  3389,  5310,  3362,
          1086,  5440,  5991,  3780,  4545,   511,   102])]
     """
-    print(f'batch的长度-->{len(batch)}')
+    # print(f'batch的长度-->{len(batch)}')
     """
     batch的长度-->4
     """
@@ -125,8 +130,8 @@ def get_dataloader(train_path, valid_path):
     :return: 训练数据集的DataLoader对象和验证数据集的DataLoader对象
     """
     train_dataset, val_dataset = load_dataset(train_path, valid_path)  # 加载训练数据集和验证数据集
-    print(f'train_dataset: {len(train_dataset)}')
-    print(f'val_dataset: {len(val_dataset)}')
+    # print(f'train_dataset: {len(train_dataset)}')
+    # print(f'val_dataset: {len(val_dataset)}')
     """
     train_dataset: 30177
     val_dataset: 413
@@ -159,3 +164,4 @@ if __name__ == '__main__':
         labels--->torch.Size([4, 283])
         """
         print('*'*80)
+        break
