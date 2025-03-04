@@ -15,4 +15,4 @@ pytorch >= 1.7.0
  - Model building(GPT2LMHeadModel(config=model_config))
  - Model train: train.py
  - Helper class function: functions_tools.py
- - Model validation: 
+ - Model validation: interact.py
