@@ -17,8 +17,8 @@ def main():
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=128, chunk_overlap=4)
     split_data = text_splitter.split_documents(data)
 
-    # 第三步：使用 OpenAI 的 Embeddings
-    embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")  # OpenAI 向量模型
+    # 第三步：使用 OpenAI_Dev 的 Embeddings
+    embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")  # OpenAI_Dev 向量模型
 
     # 第四步：存入 FAISS 向量数据库
     vector_store = FAISS.from_documents(split_data, embeddings)

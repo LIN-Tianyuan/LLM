@@ -43,6 +43,8 @@ pip install langchain
  - Customized Model Classes (model_ChatGLM.py)
  - Build Faiss Index (get_vector.py)
  - Implement QA Local Knowledge Base (main.py)
+#### 5. Usage
+ - Run main.py
 
 ## Notice（重点）
 ### 1. 大模型的微调手段
@@ -65,3 +67,29 @@ dataloader:
  - 一句话：ABCD
  - A --> B; AB --> C; ABC --> D
  - 构建dataloader脚本（data_preprocess/dataloader.py）
+### 3. 电商评论文本分类
+数据:
+ - train.txt
+ - prompt.txt
+ - dev.txt
+ - verbalizer.txt
+
+项目配置文件：
+ - pet_config.py
+
+数据预处理(data_handle)：
+ - template.py
+ - data_preprocess.py
+ - data_loader.py
+
+工具类(utils):
+ - verbalizer.py
+### 4. 为什么要填充 encoded?(神经网络的张量计算要求相同形状的输入)
+ - 保持序列长度一致：Transformer 模型（如 BERT、T5）需要固定长度输入，否则 batch 计算时会报错。
+ - 提高计算效率：填充后可以使用 tensor 并行计算，不需要对每个样本单独处理。
+ - 防止模型误解：用 pad_token_id 让模型知道哪些部分是无效填充，不应该被关注（例如，在 attention_mask 中会标记出来）。
+### 5. 什么时候需要运行返回tensor?
+ - 适用于 PyTorch、TensorFlow 训练模型(返回)
+   - 如果要把数据 直接输入深度学习模型进行训练，通常需要返回张量（Tensor），这样可以更高效地利用 GPU 计算。
+ - 适用于数据预处理、调试、非深度学习任务(不返回)
+   - 如果只是想检查 tokenized_output，或者在训练前进行 预处理、数据分析，通常不需要返回 Tensor，而是返回普通的 Python dict 或 list。
