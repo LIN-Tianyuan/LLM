@@ -78,7 +78,7 @@ pip install -U langchain langchain-openai
 ```bash
 LANGSMITH_TRACING=true
 LANGSMITH_ENDPOINT="https://api.smith.langchain.com"
-LANGSMITH_API_KEY="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"
+LANGSMITH_API_KEY="<>"
 LANGSMITH_PROJECT="pr-standard-loincloth-39"
 OPENAI_API_KEY="<your-openai-api-key>"
 ```
