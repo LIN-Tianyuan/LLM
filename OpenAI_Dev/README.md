@@ -327,3 +327,192 @@ AIMessage.response_metadata 字段中。
  - 使⽤回调
    - 还有⼀些特定于 API 的回调上下⽂管理器，允许跟踪多个调⽤中的令牌使⽤情况。⽬前仅为
      OpenAI API 和 Bedrock Anthropic API 实现了此功能。
+## 五、Multimode 集成
+### 1. 多模态数据数据传输
+将要求模型描述⼀幅图像。(multimode)
+
+最常⽀持的传⼊图像的⽅式是将其作为字节字符串传⼊。(multimode/multimode_image_base64.py)
+
+传⼊多幅图像(multimode/multimode_image_list.py)
+
+### 2. ⼯具调⽤(multimode/tools_call.py)
+## 六、Output parsers: JSON, XML, YAML
+output-parser
+## 七、自定义Tools，调⽤ Tools集成内建 Tools
+### 1. 自定义Tools(tools)
+LangChain 提供了三种创建⼯具的⽅式：
+1. 使⽤@tool装饰器 -- 定义⾃定义⼯具的最简单⽅式。
+2. 使⽤StructuredTool.from_function 类⽅法 -- 这类似于 @tool 装饰器，但允许更多配置和同步和异步实现的规范。
+3. 通过⼦类化BaseTool -- 这是最灵活的⽅法，它提供了最⼤程度的控制，但需要更多的⼯作量和代码。 @tool 或 StructuredTool.from_function 类⽅法对于⼤多数⽤例应该⾜够了。 提示 如果⼯具具有精⼼选择的名称、描述和 JSON 模式，模型的性能会更好。
+### 2. 调⽤ Tools集成内建 Tools(tools_integrate)
+https://python.langchain.com/v0.2/docs/integrations/tools/
+## 八、创建和运行 Agent
+单独来说，语⾔模型⽆法采取⾏动 - 它们只能输出⽂本。
+
+LangChain 的⼀个重要⽤例是创建代理。
+
+代理是使⽤ LLM 作为推理引擎的系统，⽤于确定应采取哪些⾏动以及这些⾏动的输⼊应该是什
+么。
+
+然后可以将这些⾏动的结果反馈给代理，并确定是否需要更多⾏动，或者是否可以结束。
+
+构建⼀个可以与多种不同⼯具进⾏交互的代理：⼀个是本地数据库，另⼀个是搜索引擎。您将能够向该代理提问，观察它调⽤⼯具，并与它进⾏对话。
+
+ - 使⽤语⾔模型，特别是它们的⼯具调⽤能⼒
+ - 创建检索器以向我们的代理公开特定信息
+ - 使⽤搜索⼯具在线查找信息
+ - 聊天历史，允许聊天机器⼈“记住”过去的交互，并在回答后续问题时考虑它们。
+ - 使⽤LangSmith调试和跟踪应⽤程序
+### 1. 安装LangChain
+```bash
+pip install langchain
+```
+### 2. LangSmith
+```bash
+export LANGCHAIN_TRACING_V2="true"
+export LANGCHAIN_API_KEY="..."
+```
+### 3. 定义工具
+Tavily（⽤于在线搜索），然后是我们将创建的本地索引上的检索器。
+#### 3.1 Tavily(⽤于在线搜索)
+LangChain 中有⼀个内置⼯具，可以轻松使⽤ Tavily 搜索引擎作为⼯具。
+```bash
+export TAVILY_API_KEY="..."
+```
+```python
+from langchain_community.tools.tavily_search import TavilySearchResults
+search = TavilySearchResults(max_results=2)
+print(search.invoke("今天上海天⽓怎么样"))
+
+"""
+[{'url': 'http://sh.cma.gov.cn/sh/tqyb/jrtq/', 'content': '上海今天⽓温度30℃
+～38℃，偏南⻛⻛⼒4-5级，有多云和雷阵⾬的可能。⽣活⽓象指数显示，⽓温⾼，⼈体感觉不舒适，
+不适宜户外活动。'}]
+"""
+```
+#### 3.2 Retriever
+Retriever 是 langchain 库中的⼀个模块，⽤于检索⼯具。检索⼯具的主要⽤途是从⼤型⽂本集合或知识库中找到相关信息。它们通常⽤于问答系统、对话代理和其他需要从⼤量⽂本数据中提取信息的应⽤程序。
+```python
+from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.vectorstores import FAISS
+from langchain_openai import OpenAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+loader = WebBaseLoader("https://zh.wikipedia.org/wiki/%E7%8C%AB")
+docs = loader.load()
+documents = RecursiveCharacterTextSplitter(
+ # chunk_size 参数在 RecursiveCharacterTextSplitter 中⽤于指定每个⽂档块的最⼤字符数。它的作⽤主要有以下⼏个⽅⾯：
+ # chunk_overlap 参数⽤于指定每个⽂档块之间的重叠字符数。这意味着，当⽂档被拆分成较⼩的块时，每个块的末尾部分会与下⼀个块的开头部分有⼀定数量的重叠字符。
+ # 第⼀个块包含字符 1 到 1000。第⼆个块包含字符 801 到 1800。第三个块包含字符 1601 到 2600。
+ chunk_size=1000, chunk_overlap=200
+).split_documents(docs)
+vector = FAISS.from_documents(documents, OpenAIEmbeddings())
+retriever = vector.as_retriever()
+
+retriever.invoke("猫的特征")[0]
+
+"""
+page_content='聽覺[编辑]
+貓每隻⽿各有32條獨⽴的肌⾁控制⽿殼轉動，因此雙⽿可單獨朝向不同的⾳源轉動，使其向獵物移動
+時仍能對周遭其他⾳源保持直接接觸。[50] 除了蘇格蘭折⽿貓這類基因突變的貓以外，貓極少有狗
+常⾒的「垂⽿」，多數的貓⽿向上直⽴。當貓忿怒或受驚時，⽿朵會貼向後⽅，並發出咆哮與「嘶」
+聲。
+貓與⼈類對低頻聲⾳靈敏度相若。⼈類中只有極少數的調⾳師能聽到20 kHz以上的⾼頻聲⾳（8.4度
+的⼋度⾳），貓則可達64kHz（10度的⼋度⾳），⽐⼈類要⾼1.6個⼋度⾳，甚⾄⽐狗要⾼1個⼋度；
+但是貓辨別⾳差須開最少5度，⽐起⼈類辨別⾳差須開最少0.5度來得粗疏。[51][47]
+嗅覺[编辑]
+家貓的嗅覺較⼈類靈敏14倍。[52]貓的⿐腔內有2億個嗅覺受器，數量甚⾄超過某些品種的狗（狗嗅
+覺細胞約1.25億～2.2億）。
+味覺[编辑]
+貓早期演化時由於基因突變，失去了甜的味覺，[53]但貓不光能感知酸、苦、鹹味，选择适合⾃⼰⼝
+味的⻝物，还能尝出⽔的味道，这⼀点是其他动物所不及的。不过总括来说猫的味觉不算完善，相⽐
+⼀般⼈類平均有9000個味蕾，貓⼀般平均僅有473個味蕾且不喜好低於室溫之⻝物。故此，貓辨認⻝
+物乃憑嗅覺多於味覺。[47]
+觸覺[编辑]
+貓在磨蹭時身上會散發出特別的費洛蒙，當這些獨有的費洛蒙留下時，⽬的就是在宣誓主權，提醒其
+它貓這是我的，其實這種⾏為算是⼀種標記地盤的象徵，會讓牠們有感到安⼼及安全感。
+被⽑[编辑]
+主条⽬：貓的⽑⾊遺傳和顏⾊
+⻑度[编辑]
+貓主要可以依據被⽑⻑度分為⻑⽑貓，短⽑貓和無⽑貓。' metadata={'source': 'https://z
+h.wikipedia.org/wiki/%E7%8C%AB', 'title': '猫 - 维基百科，⾃由的百科全书', 'la
+nguage': 'zh'}
+"""
+```
+填充了我们将要进⾏Retriever的索引，我们可以轻松地将其转换为⼀个⼯具（代理程序正确使⽤所需的格式）
+```python
+from langchain.tools.retriever import create_retriever_tool
+
+retriever_tool = create_retriever_tool(
+   retriever,
+   "wiki_search",
+   "搜索维基百科",
+)
+```
+使⽤语⾔模型
+```python
+from langchain_openai import ChatOpenAI
+model = ChatOpenAI(model_name="gpt-4")
+
+from langchain_core.messages import HumanMessage
+response = model.invoke([HumanMessage(content="hi!")])
+response.content
+
+"""
+'Hello! How can I assist you today?'
+"""
+
+model_with_tools = model.bind_tools(tools)
+
+response = model_with_tools.invoke([HumanMessage(content="今天上海天⽓怎么样")
+                                    ])
+print(f"ContentString: {response.content}")
+print(f"ToolCalls: {response.tool_calls}")
+
+"""
+ContentString:
+ToolCalls: [{'name': 'tavily_search_results_json', 'args': {'query': '今天上
+海天⽓'}, 'id': 'call_EOxYscVIVjttlbztWoR1CvTm', 'type': 'tool_call'}]
+"""
+```
+### 4. 创建代理程序
+```python
+from langchain.agents import create_tool_calling_agent
+agent = create_tool_calling_agent(model, tools, prompt)
+
+from langchain.agents import AgentExecutor
+agent_executor = AgentExecutor(agent=agent, tools=tools)
+```
+### 5. 运行代理
+```python
+print(agent_executor.invoke({"input": "你好"}))
+
+"""
+{'input': '你好', 'output': '你好！有什么我可以帮助你的吗？'}
+"""
+```
+### 6. 添加记忆
+```python
+from langchain_core.messages import AIMessage, HumanMessage
+agent_executor.invoke(
+   {
+      "chat_history": [
+         HumanMessage(content="hi! my name is bob"),
+         AIMessage(content="你好Bob！我今天能帮你什么？"),
+      ],
+      "input": "我的名字是什么?",
+   }
+)
+```
+```python
+agent_with_chat_history = RunnableWithMessageHistory(
+ agent_executor,
+ get_session_history,
+ input_messages_key="input",
+ history_messages_key="chat_history",
+)
+
+response = agent_with_chat_history.invoke(
+   {"input": "Hi，我的名字是Cyber"},
+   config={"configurable": {"session_id": "123"}},
+)
+```

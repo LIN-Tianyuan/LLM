@@ -12,6 +12,6 @@ prompt = ChatPromptTemplate.from_messages(
     ]
 )
 model = ChatOpenAI(model_name="gpt-4")
-#字典作为输入并返回消息作为输出
+# 字典作为输入并返回消息作为输出
 runnable = prompt | model
 print(runnable)
