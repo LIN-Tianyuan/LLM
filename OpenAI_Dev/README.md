@@ -516,3 +516,14 @@ response = agent_with_chat_history.invoke(
    config={"configurable": {"session_id": "123"}},
 )
 ```
+## 九、Embedding
+embedding-models
+## 十、RAG
+检索增强⽣成（RAG）是指对⼤型语⾔模型输出进⾏优化，使其能够在⽣成响应之前引⽤训练数据来源之外的权威知识库。⼤型语⾔模型（LLM）⽤海量数据进⾏训练，使⽤数⼗亿个参数为回答问题、翻译语⾔和完成句⼦等任务⽣成原始输出。在 LLM 本就强⼤的功能基础上，RAG 将其扩展为能访问特定领域或组织的内部知识库，所有这些都⽆需重新训练模型。这是⼀种经济⾼效地改进 LLM 输出的⽅法，让它在各种情境下都能保持相关性、准确性和实⽤性。
+
+### AI助手：小帽问答App(D9/rag-app)
+```bash
+streamlit run ./txt_search.py --server.port 1234
+```
+
+
