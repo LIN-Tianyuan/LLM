@@ -525,5 +525,8 @@ embedding-models
 ```bash
 streamlit run ./txt_search.py --server.port 1234
 ```
+## 十二、问答系统
+爬了一篇博客的内容 → 切成小块 → 用向量数据库存起来 → 用用户提问去检索相关内容 → 再让 GPT 模型结合上下文给出答案
 
+LangChain + LangGraph 实现的智能问答+记忆型代理系统（D12/agent-tools/rag_chat_agent.py）
 
