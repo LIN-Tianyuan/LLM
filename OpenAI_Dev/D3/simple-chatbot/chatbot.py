@@ -1,20 +1,23 @@
 # 导入Streamlit库，用于创建Web应用
-import streamlit as st
+import streamlit as st      # streamlit：用来快速创建 Web 应用界面
 # 导入OpenAI库，用于与OpenAI的API进行交互
-from openai import OpenAI
+from openai import OpenAI   # OpenAI：用来调用 GPT 模型
 # 导入PIL库，用于图像处理
-from PIL import Image
+from PIL import Image       # PIL：用来处理图像
 # 导入base64库，用于编码和解码base64字符串
-import base64
+import base64               # 把图片转换成 OpenAI 能读懂的格式（base64）
 # 导入io库，用于处理字节流
 import io
 
 # 确保你已经安装了所有必要的库，并且它们的版本是最新的。你可以使用以下命令重新安装这些库：
 # pip install --upgrade streamlit openai pillow
 # 创建OpenAI客户端实例
-client = OpenAI()
+client = OpenAI()   # 创建一个连接 OpenAI 的客户端对象
 
 
+
+# 把你输入的问题发给 GPT-4o 模型
+# 返回它生成的回答
 # 定义函数来处理文本输入
 def generate_text_response(prompt):
     # 调用OpenAI的API生成文本响应
@@ -38,11 +41,25 @@ def encode_image(image_path):
         return base64.b64encode(image_file.read()).decode('utf-8')
 
 
+# 把你上传的图片变成 base64 编码
+# 通过 GPT-4o 的多模态接口问它 “这张图片里有什么？”
+# GPT 会识图并回答
+
 # 定义函数来处理图像输入
 def generate_image_response(image):
     # 将 PIL 图像转换为字节数组
+    """
+    创建一个内存中的“虚拟文件”（就像一个内存版的文件）
+    io.BytesIO() 是 Python 的工具，专门用来处理二进制数据（比如图片、音频）
+    """
     img_byte_arr = io.BytesIO()
+
+    # 把你传进来的 image（一个 PIL 图像对象）保存到内存里的这个“虚拟文件”中
+    # format='PNG' 表示我们用 PNG 格式保存图片内容
+    # 注意：不是保存到磁盘，而是保存到 内存流（img_byte_arr） 里
     image.save(img_byte_arr, format='PNG')
+    # 从刚才的虚拟文件中提取出 纯二进制内容
+    # 这个变量现在变成了一个 bytes 类型：图片的原始数据（你可以理解成真正可传输/可编码的图片内容）
     img_byte_arr = img_byte_arr.getvalue()
     # 将字节数组转换为 base64 编码字符串
     base64_image = base64.b64encode(img_byte_arr).decode('utf-8')
@@ -100,7 +117,7 @@ if uploaded_file is not None:
     # 使用PIL打开上传的图像文件
     image = Image.open(uploaded_file)
     # 显示上传的图像
-    st.image(image, caption="上传的图片", use_column_width=True)
+    st.image(image, caption="上传的图片", use_container_width=True)
     # 创建一个按钮，当按钮被点击时执行以下操作
     if st.button("发送图片"):
         # 调用generate_image_response函数生成图像响应
